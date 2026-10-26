@@ -1,6 +1,6 @@
+const addButton: HTMLButtonElement | null = document.querySelector("#todoAddButton");
 import TodoEntry from "./TodoEntry.js";
 
-const addButton: HTMLButtonElement | null = document.querySelector("#todoAddButton");
 const inputTextField: HTMLInputElement | null = document.querySelector("#todoInputField");
 const todosContainer: HTMLDivElement = document.querySelector("#todosContainer")!;
 

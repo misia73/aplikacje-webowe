@@ -1,4 +1,4 @@
-import TodoEntry from "./TodoEntry.js";
+"use strict";
 const addButton = document.querySelector("#todoAddButton");
 const inputTextField = document.querySelector("#todoInputField");
 const todosContainer = document.querySelector("#todosContainer");
@@ -6,7 +6,11 @@ let arrayOfTodos = [];
 if (addButton && inputTextField && todosContainer) {
     addButton.addEventListener('click', () => {
         const titleValue = inputTextField.value.trim() || "Bez tytułu";
-        let newTodo = new TodoEntry(arrayOfTodos.length, inputTextField.value);
+        let newTodo = {
+            id: Date.now(),
+            title: titleValue,
+            status: "todo"
+        };
         arrayOfTodos.push(newTodo);
         inputTextField.value = '';
         buildList();
@@ -15,6 +19,59 @@ if (addButton && inputTextField && todosContainer) {
 function buildList() {
     todosContainer.innerHTML = "";
     arrayOfTodos.forEach(element => {
-        todosContainer.innerHTML += element.render();
+        let container = document.createElement("div");
+        container.classList.add("card-body", "mt-1", "shadow");
+        let container2 = document.createElement("div");
+        container2.classList.add("card");
+        let title = document.createElement('h3');
+        title.textContent = "Tytuł: " + element.title;
+        // Etykieta i select do zmiany statusu
+        let statusLabel = document.createElement('label');
+        statusLabel.textContent = "Zmień status: ";
+        statusLabel.classList.add("fw-bold", "d-block", "mt-2");
+        let cardStatusSelect = document.createElement('select');
+        cardStatusSelect.classList.add("form-select", "mb-2");
+        const statuses = ["todo", "doing", "done"];
+        statuses.forEach(st => {
+            const option = document.createElement("option");
+            option.value = st;
+            option.textContent = st.toUpperCase();
+            if (st === element.status) {
+                option.selected = true;
+            }
+            cardStatusSelect.appendChild(option);
+        });
+        // Mały tekst wyświetlający aktualny status
+        let statusInfo = document.createElement('small');
+        statusInfo.classList.add("text-muted", "d-block", "mb-3");
+        statusInfo.textContent = "Aktualny status: " + element.status.toUpperCase();
+        // Obsługa zmiany statusu w liście rozwijanej
+        cardStatusSelect.addEventListener('change', (e) => {
+            const target = e.target;
+            element.status = target.value;
+            // Aktualizujemy mały tekst na bieżąco
+            statusInfo.textContent = "Aktualny status: " + element.status.toUpperCase();
+        });
+        let id = document.createElement('p');
+        id.classList.add("small");
+        id.textContent = "ID: " + element.id;
+        let deleteB = document.createElement("button");
+        deleteB.textContent = "Delete";
+        deleteB.classList.add("btn-danger", "btn", "w-100", "p-3");
+        deleteB.addEventListener('click', () => {
+            const index = arrayOfTodos.findIndex(todo => todo.id === element.id);
+            if (index !== -1) {
+                arrayOfTodos.splice(index, 1);
+            }
+            buildList();
+        });
+        container.appendChild(title);
+        container.appendChild(statusLabel);
+        container.appendChild(cardStatusSelect);
+        container.appendChild(statusInfo); // Dodanie małego tekstu pod selectem
+        container.appendChild(id);
+        container.appendChild(deleteB);
+        container2.appendChild(container);
+        todosContainer.appendChild(container2);
     });
 }
